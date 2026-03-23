@@ -1,16 +1,49 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useEffect } from "react";
+import { SleepClock } from "@/components/SleepClock";
+import { ParentSidebar } from "@/components/ParentSidebar";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  const [sleepTime, setSleepTime] = useState("19:30");
+  const [wakeTime, setWakeTime] = useState("07:00");
+  const [showClock, setShowClock] = useState(true);
+  const [timeOverride, setTimeOverride] = useState<number | null>(null);
+  const [now, setNow] = useState(new Date());
+
+  // Tick every second
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Build the display time (real or overridden)
+  const displayTime = timeOverride !== null
+    ? (() => {
+        const d = new Date(now);
+        d.setHours(Math.floor(timeOverride / 60), timeOverride % 60, 0, 0);
+        return d;
+      })()
+    : now;
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="flex h-screen w-full overflow-hidden">
+      <ParentSidebar
+        sleepTime={sleepTime}
+        wakeTime={wakeTime}
+        showClock={showClock}
+        timeOverride={timeOverride}
+        onSleepTimeChange={setSleepTime}
+        onWakeTimeChange={setWakeTime}
+        onShowClockChange={setShowClock}
+        onTimeOverrideChange={setTimeOverride}
+      />
+      <SleepClock
+        currentTime={displayTime}
+        sleepTime={sleepTime}
+        wakeTime={wakeTime}
+        showClock={showClock}
+      />
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
